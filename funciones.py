@@ -136,3 +136,9 @@ def compare_classifiers(estimators, X_test, y_test, n_cols=2):
     fig.tight_layout()
     
     return
+
+def to_dense(X):
+    """
+    Fución auxiliar para pipeline de neural network
+    """
+    return X.todense()
