@@ -9,6 +9,7 @@ from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 from sklearn.metrics import roc_auc_score, confusion_matrix, classification_report
 from sklearn.model_selection import GridSearchCV
+from tensorflow.keras.models import Sequential
 from time import time
 
 
@@ -108,9 +109,13 @@ def compare_classifiers(estimators, X_test, y_test, n_cols=2):
 
     colors = ['dodgerblue', 'tomato', 'purple', 'orange']
 
-    for n, model in enumerate(estimators):
+    for n, clf in enumerate(estimators):
 
-        y_hat = model[1].predict(X_test) 
+        y_hat = clf[1].predict(X_test)
+        # Si las prediciones son probabilidades, binarizar
+        if y_hat.dtype == 'float32':
+            y_hat = [1 if i >= .5 else 0 for i in y_hat]
+
         dc = classification_report(y_test, y_hat, output_dict=True)
 
         plt.subplot(rows, n_cols, n + 1)
@@ -127,7 +132,7 @@ def compare_classifiers(estimators, X_test, y_test, n_cols=2):
             plt.axvline(x=.5, ls='--')
 
         plt.yticks([1.0, 2.0, 3.0], ['Precision', 'Recall', 'f1-Score'])
-        plt.title(model[0])
+        plt.title(clf[0])
         plt.xlim((0.1, 1.0))
 
         if (n + 1) % 2 == 0:
